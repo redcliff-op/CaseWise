@@ -17,6 +17,7 @@ type state = {
 type actions = {
   signIn: () => Promise<void>;
   signInSilent: () => Promise<void>;
+  signOut: () => Promise<void>
 };
 
 type loaders = {
@@ -54,6 +55,16 @@ const useStore = create<state & actions & loaders>((set, get) => ({
       console.log(error);
     }
   },
+
+  signOut: async() => {
+    try {
+      await GoogleSignin.signOut()
+      set({user:null})
+      router.dismissAll()
+    } catch (error) {
+      console.log(error)
+    }
+  }
 }));
 
 export default useStore;

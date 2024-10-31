@@ -29,6 +29,7 @@ export default function RootLayout() {
     <Stack screenOptions={{ headerShown: false, statusBarStyle: 'dark', statusBarColor:'#F4EEE4'}}>
       <Stack.Screen name="index" />
       <Stack.Screen name="Home" options={{animation:'fade_from_bottom'}} />
+      <Stack.Screen name="Profile" options={{ animation: 'ios' }} />
     </Stack>
   );
 }

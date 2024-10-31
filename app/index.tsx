@@ -1,11 +1,22 @@
 import { View, Text, Pressable, ActivityIndicator } from 'react-native'
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import useStore from '@/store/useStore'
+import useUtilStore from '@/store/useUtilStore'
+import { useFocusEffect } from 'expo-router'
 
 const index = () => {
 
-  const { signIn, signInSilent, signInSilentLoading } = useStore()
+  useFocusEffect(
+    useCallback(() => {
+      useUtilStore.setState({ isTabScreen: false })
+      return () => {
+        useUtilStore.setState({ isTabScreen: true })
+      };
+    }, [])
+  );
+
+  const { signIn, signInSilent } = useStore()
 
   useEffect(() => {
     signInSilent()
@@ -25,13 +36,9 @@ const index = () => {
         onPress={signIn}
         className='bg-primary flex-row self-stretch items-center p-5 justify-center rounded-full'
       >
-        {signInSilentLoading ? (
-          < ActivityIndicator size={28} color={'black'} />
-        ) : (
-          <Text className='text-white text-2xl'>
-            Sign In
-          </Text>
-        )}
+        <Text className='text-white text-2xl'>
+          Sign In
+        </Text>
       </Pressable>
     </SafeAreaView >
   )

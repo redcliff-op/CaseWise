@@ -1,9 +1,20 @@
 import { View, Text, SafeAreaView, StatusBar, Pressable } from 'react-native'
-import React from 'react'
+import React, { useCallback, useEffect } from 'react'
 import Animated from 'react-native-reanimated'
 import useStore from '@/store/useStore'
+import useUtilStore from '@/store/useUtilStore'
+import { useFocusEffect } from 'expo-router'
 
 const Profile = () => {
+
+  useFocusEffect(
+    useCallback(() => {
+      useUtilStore.setState({isTabScreen:false})
+      return () => {
+        useUtilStore.setState({isTabScreen:true})
+      };
+    }, [])
+  );
 
   const { user, signOut } = useStore()
 

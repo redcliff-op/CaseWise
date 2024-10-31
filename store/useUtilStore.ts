@@ -4,7 +4,14 @@ type actions = {
   getGreeting: () => string;
 };
 
-const useUtilStore = create<actions>((set, get) => ({
+type state = {
+  isTabScreen: boolean 
+}
+
+const useUtilStore = create<actions & state>((set, get) => ({
+  
+  isTabScreen: true,
+  
   getGreeting: () => {
     const currentHour = new Date().getHours();
     if (currentHour < 12) {

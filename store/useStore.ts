@@ -64,8 +64,9 @@ const useStore = create<state & actions & loaders>((set, get) => ({
   signOut: async () => {
     try {
       await GoogleSignin.signOut();
-      set({ user: null });
       router.dismissAll();
+      await new Promise(resolve=>setTimeout(resolve,500))
+      set({ user: null });
     } catch (error) {
       console.log(error);
     }

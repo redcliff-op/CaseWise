@@ -19,3 +19,7 @@ web-build/
 *.apk
 expo-env.d.ts
 # @end expo-cli
+
+.env
+google-services.json
+GoogleService-Info.plist

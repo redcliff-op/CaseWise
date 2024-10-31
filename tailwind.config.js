@@ -8,7 +8,8 @@ module.exports = {
         "background":"#F4EEE4",
         "darkbg":"#241C1A",
         "primary":"#452B01",
-        "secondary":"#EBD9CD"
+        "secondary":"#EBD9CD",
+        "tertiary": "#507680"
       }
     },
   },

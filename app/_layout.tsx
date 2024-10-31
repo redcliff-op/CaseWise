@@ -1,5 +1,5 @@
 import { useFonts } from 'expo-font';
-import { Stack, useSegments } from 'expo-router';
+import { router, Stack, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
 import 'react-native-reanimated';
@@ -54,7 +54,10 @@ const RootLayout: React.FC = () => {
           {tabs.map((tab) => (
             <TabButton
               key={tab.name}
-              onPress={() => setActiveScreen(tab.screenIndex)}
+              onPress={()=>{
+                setActiveScreen(tab.screenIndex)
+                router.navigate(tab.name)
+              }}
               isActive={activeScreen === tab.screenIndex}
               icon={tab.icon}
             />
@@ -63,7 +66,8 @@ const RootLayout: React.FC = () => {
       )}
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="index" />
-        <Stack.Screen name="Home" options={{ animation: 'fade' }} />
+        <Stack.Screen name="Home" options={{ animation: 'flip' }} />
+        <Stack.Screen name="Documents" options={{ animation: 'flip' }} />
         <Stack.Screen name="Profile" options={{ animation: 'ios' }} />
       </Stack>
     </View>

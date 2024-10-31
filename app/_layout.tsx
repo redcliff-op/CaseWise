@@ -1,12 +1,11 @@
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { Stack, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
 import 'react-native-reanimated';
 import "../global.css";
 import * as NavigationBar from 'expo-navigation-bar';
-import { View } from 'react-native';
-import useUtilStore from '@/store/useUtilStore';
+import { View, StatusBar } from 'react-native';
 import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
 import TabButton from '../components/TabButton';
 
@@ -25,8 +24,8 @@ const RootLayout: React.FC = () => {
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
 
-  const { isTabScreen } = useUtilStore();
   const [activeScreen, setActiveScreen] = useState<number>(0);
+  const segments = useSegments() as string[];
 
   useEffect(() => {
     if (loaded) {
@@ -39,10 +38,14 @@ const RootLayout: React.FC = () => {
   }
 
   NavigationBar.setBackgroundColorAsync("#F4EEE4");
+  StatusBar.setBarStyle("dark-content");
+
+  const screensWithoutNav = ['Profile', 'index'];
+  const shouldShowNav = (segments.length>=1) ? !segments.some(segment => screensWithoutNav.includes(segment)):null
 
   return (
     <View className='flex-1'>
-      {isTabScreen && (
+      {shouldShowNav && (
         <Animated.View
           entering={FadeInDown}
           exiting={FadeOutDown}
@@ -58,7 +61,7 @@ const RootLayout: React.FC = () => {
           ))}
         </Animated.View>
       )}
-      <Stack screenOptions={{ headerShown: false, statusBarStyle: 'dark', statusBarColor: '#F4EEE4' }}>
+      <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="index" />
         <Stack.Screen name="Home" options={{ animation: 'fade' }} />
         <Stack.Screen name="Profile" options={{ animation: 'ios' }} />

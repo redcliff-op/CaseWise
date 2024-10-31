@@ -1,20 +1,10 @@
-import { View, Text, SafeAreaView, StatusBar, Pressable } from 'react-native'
-import React, { useCallback, useEffect } from 'react'
-import Animated from 'react-native-reanimated'
+import { View, Text, Pressable } from 'react-native'
+import React from 'react'
+import Animated, { FadeInDown } from 'react-native-reanimated'
 import useStore from '@/store/useStore'
-import useUtilStore from '@/store/useUtilStore'
-import { useFocusEffect } from 'expo-router'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 const Profile = () => {
-
-  useFocusEffect(
-    useCallback(() => {
-      useUtilStore.setState({isTabScreen:false})
-      return () => {
-        useUtilStore.setState({isTabScreen:true})
-      };
-    }, [])
-  );
 
   const { user, signOut } = useStore()
 
@@ -22,7 +12,7 @@ const Profile = () => {
     <SafeAreaView className='flex-1 bg-background px-4 justify-between'>
       <View className=' gap-2 -mx-4'>
         <Animated.Image
-          sharedTransitionTag={user?.user.email+"-image"}
+          sharedTransitionTag={user?.user.email + "-image"}
           source={{ uri: user?.user?.photo?.toString() }}
           className='w-[50%] aspect-square self-center rounded-full border-primary'
         />
@@ -35,14 +25,16 @@ const Profile = () => {
           </Text>
         </View>
       </View>
-      <Pressable
-        onPress={signOut}
-        className='p-5 bg-primary rounded-full'
-      >
-        <Text className='text-center text-xl text-white font-semibold'>
-          Sign Out
-        </Text>
-      </Pressable>
+      <Animated.View entering={FadeInDown}>
+        <Pressable
+          onPress={signOut}
+          className='p-5 bg-primary rounded-full'
+        >
+          <Text className='text-center text-xl text-white font-semibold'>
+            Sign Out
+          </Text>
+        </Pressable>
+      </Animated.View>
     </SafeAreaView>
   )
 }

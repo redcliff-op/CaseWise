@@ -1,20 +1,10 @@
-import { View, Text, Pressable, ActivityIndicator } from 'react-native'
-import React, { useCallback, useEffect } from 'react'
+import { View, Text, Pressable } from 'react-native'
+import React, { useEffect } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import useStore from '@/store/useStore'
-import useUtilStore from '@/store/useUtilStore'
-import { useFocusEffect } from 'expo-router'
+
 
 const index = () => {
-
-  useFocusEffect(
-    useCallback(() => {
-      useUtilStore.setState({ isTabScreen: false })
-      return () => {
-        useUtilStore.setState({ isTabScreen: true })
-      };
-    }, [])
-  );
 
   const { signIn, signInSilent } = useStore()
 

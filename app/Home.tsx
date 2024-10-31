@@ -1,5 +1,5 @@
-import { View, Text, Image, ScrollView, Pressable } from 'react-native'
-import React, { useEffect } from 'react'
+import { View, Text, Pressable } from 'react-native'
+import React from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import useStore from '@/store/useStore'
 import Animated from 'react-native-reanimated'

@@ -5,12 +5,10 @@ type actions = {
 };
 
 type state = {
-  isTabScreen: boolean 
+  
 }
 
 const useUtilStore = create<actions & state>((set, get) => ({
-  
-  isTabScreen: true,
   
   getGreeting: () => {
     const currentHour = new Date().getHours();

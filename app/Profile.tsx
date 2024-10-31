@@ -1,6 +1,6 @@
 import { View, Text, Pressable } from 'react-native'
 import React from 'react'
-import Animated, { FadeInDown } from 'react-native-reanimated'
+import Animated, { FadeInDown, SharedTransition } from 'react-native-reanimated'
 import useStore from '@/store/useStore'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useShallow } from 'zustand/shallow'
@@ -17,7 +17,7 @@ const Profile = () => {
         <Animated.Image
           sharedTransitionTag={user?.user.email + "-image"}
           source={{ uri: user?.user?.photo?.toString() }}
-          className='w-[50%] aspect-square self-center rounded-full border-primary'
+          className='w-[50%] aspect-square self-center rounded-full border-primary border-4'
         />
         <View>
           <Text className='text-2xl font-bold text-primary self-center'>
@@ -28,7 +28,7 @@ const Profile = () => {
           </Text>
         </View>
       </View>
-      <Animated.View entering={FadeInDown}>
+      <Animated.View entering={FadeInDown.duration(400)}>
         <Pressable
           onPress={signOut}
           className='p-5 bg-primary rounded-full'

@@ -47,8 +47,8 @@ const RootLayout: React.FC = () => {
     <View className='flex-1'>
       {shouldShowNav && (
         <Animated.View
-          entering={FadeInDown}
-          exiting={FadeOutDown}
+          entering={FadeInDown.duration(400)}
+          exiting={FadeOutDown.duration(400)}
           className='p-1 bg-darkbg flex-row absolute z-10 gap-2 self-center bottom-0 rounded-full'
         >
           {tabs.map((tab) => (

@@ -3,10 +3,13 @@ import React from 'react'
 import Animated, { FadeInDown } from 'react-native-reanimated'
 import useStore from '@/store/useStore'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { useShallow } from 'zustand/shallow'
 
 const Profile = () => {
 
-  const { user, signOut } = useStore()
+  const [user, signOut] = useStore(
+    useShallow((state)=>[state.user, state.signOut])
+  )
 
   return (
     <SafeAreaView className='flex-1 bg-background px-4 justify-between'>

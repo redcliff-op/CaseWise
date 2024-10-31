@@ -2,11 +2,13 @@ import { View, Text, Pressable } from 'react-native'
 import React, { useEffect } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import useStore from '@/store/useStore'
-
+import { useShallow } from 'zustand/shallow'
 
 const index = () => {
 
-  const { signIn, signInSilent } = useStore()
+  const [signIn, signInSilent] = useStore(
+    useShallow((state)=>[state.signIn, state.signInSilent])
+  )
 
   useEffect(() => {
     signInSilent()

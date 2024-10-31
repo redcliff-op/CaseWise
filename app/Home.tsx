@@ -6,11 +6,16 @@ import Animated from 'react-native-reanimated'
 import useUtilStore from '@/store/useUtilStore'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { router } from 'expo-router'
+import { useShallow } from 'zustand/shallow'
 
 const Home = () => {
 
-  const { user } = useStore()
-  const { getGreeting } = useUtilStore()
+  const [user] = useStore(
+    useShallow((state) => [state.user])
+  )
+  const [getGreeting] = useUtilStore(
+    useShallow((state) => [state.getGreeting])
+  )
 
   return (
     <SafeAreaView className='flex-1 px-4 bg-background'>

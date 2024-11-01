@@ -5,11 +5,18 @@ import {
   User,
 } from "@react-native-google-signin/google-signin";
 import { router } from "expo-router";
-import { Content, GoogleGenerativeAI } from "@google/generative-ai";
+import {
+  Content,
+  EnhancedGenerateContentResponse,
+  GenerateContentResult,
+  GoogleGenerativeAI,
+} from "@google/generative-ai";
 import RNFS from "react-native-fs";
+import { documentPrompt, imagePrompt } from "@/constants/prompts";
+import { GEMINI_API_KEY, WEB_CLIENT_ID } from "@/Keys";
 
 GoogleSignin.configure({
-  webClientId: process.env.WEB_CLIENT_ID,
+  webClientId: WEB_CLIENT_ID
 });
 
 type state = {
@@ -21,7 +28,12 @@ type actions = {
   signIn: () => Promise<void>;
   signInSilent: () => Promise<void>;
   signOut: () => Promise<void>;
-  getGeminiResponse: (filePath: string) => Promise<string>;
+  getGeminiResponse: (
+    prompt: string,
+    mediaType: string, // well, just "file" and "image" for now :)
+    media: string | null,
+    json?: boolean
+  ) => Promise<string>;
 };
 
 type loaders = {
@@ -65,24 +77,26 @@ const useStore = create<state & actions & loaders>((set, get) => ({
     try {
       await GoogleSignin.signOut();
       router.dismissAll();
-      await new Promise(resolve=>setTimeout(resolve,500))
+      await new Promise((resolve) => setTimeout(resolve, 500));
       set({ user: null });
     } catch (error) {
       console.log(error);
     }
   },
 
-  getGeminiResponse: async (filePath: string): Promise<string> => {
+  getGeminiResponse: async (
+    prompt: string,
+    mediaType: string,
+    media: string | null,
+    json: boolean = false
+  ): Promise<string> => {
     try {
-      const pdfData = await RNFS.readFile(filePath, "base64");
       const history = get().contextHistory;
-      const genAI = new GoogleGenerativeAI(
-        "AIzaSyBBcXPAEElnI6edh7j0e_4gbWwMS0OmRxQ"
-      );
+      const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
       const model = genAI.getGenerativeModel({
         model: "gemini-1.5-flash",
         generationConfig: {
-          responseMimeType: "application/json",
+          responseMimeType: json ? "application/json" : "text/plain",
         },
       });
 
@@ -90,78 +104,29 @@ const useStore = create<state & actions & loaders>((set, get) => ({
         history: history,
       });
 
-      const pdf = {
-        inlineData: {
-          data: pdfData,
-          mimeType: "application/pdf",
-        },
-      };
-      const result = await chat.sendMessage([
-        `Analyze the following legal document and extract all key information that a user should know, including terms, obligations, conditions, and potential risks. Highlight any clauses or terms that could be unfavorable, hidden, or misleading, and flag them as 'concerning' or 'shady' if applicable. Summarize the key takeaways clearly and list any specific actions the user should take
-        
-        Return the response the following JSON response
+      let result: GenerateContentResult;
 
-        {
-          \"document_name\": \"\",
-          \"document_type\": \"\",
-          \"parties_involved\": [],
-          \"effective_date\": \"\",
-          \"termination_date\": \"\",
-          \"key_terms\": {
-            \"description\": \"\",
-            \"terms\": [
-              {
-                \"term\": \"\",
-                \"importance\": \"\"
-              }
-            ]
+      if (mediaType === "file" && media) {
+        const pdfData = await RNFS.readFile(media, "base64");
+        const pdf = {
+          inlineData: {
+            data: pdfData,
+            mimeType: "application/pdf",
           },
-          \"obligations\": [
-            {
-              \"obligation\": \"\",
-              \"description\": \"\",
-              \"due_date\": null
-            }
-          ],
-          \"risks\": {
-            \"general\": [
-              {
-                \"risk\": \"\",
-                \"impact\": \"\",
-                \"likelihood\": \"\",
-                \"concerning\": false
-              }
-            ],
-            \"legal\": [],
-            \"financial\": [],
-            \"reputational\": []
+        };
+        result = await chat.sendMessage([documentPrompt, pdf]);
+      } else if (mediaType === "image" && media) {
+        const fsImage = await RNFS.readFile(media, "base64");
+        const img = {
+          inlineData: {
+            data: fsImage,
+            mimeType: "image/png",
           },
-          \"shady_clauses\": [
-            {
-              \"clause\": \"\",
-              \"description\": \"\",
-              \"reason\": \"\",
-              \"potential_impact\": \"\"
-            }
-          ],
-          \"action_items\": [
-            {
-              \"action\": \"\",
-              \"deadline\": null
-            }
-          ],
-          \"dispute_resolution\": {
-            \"method\": \"\",
-            \"jurisdiction\": \"\"
-          },
-          \"termination_conditions\": [],
-          \"review_recommendations\": \"\",
-          \"user_protection_tips\": \"\",
-          \"overall_analysis\": \"\"
-        }
-        `,
-        pdf,
-      ]);
+        };
+        result = await chat.sendMessage([json ? imagePrompt : prompt, img]);
+      } else {
+        result = await chat.sendMessage(prompt);
+      }
 
       const response = result.response;
       const text = response.text();
@@ -169,7 +134,7 @@ const useStore = create<state & actions & loaders>((set, get) => ({
       set({ contextHistory: history });
       return text;
     } catch (error) {
-      console.error("Error uploading PDF:", error);
+      console.error(error);
       return "";
     }
   },

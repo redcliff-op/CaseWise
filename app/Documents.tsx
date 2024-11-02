@@ -8,12 +8,13 @@ import LottieView from 'lottie-react-native';
 import Ionicons from '@expo/vector-icons/Ionicons'
 import Collapsible from 'react-native-collapsible'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
+import { router } from 'expo-router'
 
 
 const Documents = () => {
 
-  const [getGeminiResponse, response, geminiLoading] = useStore(
-    useShallow((state) => [state.getGeminiResponse, state.documentAnalysis, state.geminiLoading])
+  const [getDocumentAnalysis, response, responseLoading] = useStore(
+    useShallow((state) => [state.getDocumentAnalysis, state.documentAnalysis, state.responseLoading])
   )
 
   const [termsExpanded, setTermsExpanded] = useState<boolean>(false)
@@ -28,14 +29,16 @@ const Documents = () => {
   const handleResponse = async () => {
     const docPickerElement = await DocumentPicker.getDocumentAsync()
     const doc = docPickerElement.assets!![0].uri
-    await getGeminiResponse("", "file", doc, true)
+    if (doc) {
+      await getDocumentAnalysis(doc)
+    }
   }
 
   const animation = useRef<LottieView>(null);
 
   return (
     <SafeAreaView className='flex-1 bg-background px-4'>
-      {geminiLoading ? (
+      {responseLoading ? (
         <Animated.View className='flex-1 bg-background items-center justify-center' entering={FadeIn} exiting={FadeOut}>
           <LottieView
             source={require('../assets/raw/docprocessing.json')}
@@ -456,7 +459,30 @@ const Documents = () => {
               ) : null}
               <Pressable
                 onPress={() => {
-                  useStore.setState({ documentAnalysis: null })
+                  router.navigate("/Summary")
+                }}
+                className='bg-tertiary rounded-xl p-5 items-center justify-center'
+              >
+                <LottieView
+                  source={require('../assets/raw/support.json')}
+                  ref={animation}
+                  autoPlay
+                  loop
+                  style={{
+                    width: '100%',
+                    height: Dimensions.get('screen').height * 0.3,
+                    alignSelf: 'center',
+                    marginBottom: 10
+                  }}
+                />
+                <Text className='text-background font-bold text-lg'>
+                  Still Finding it difficult to understand? {"\n"}
+                  Try out our Summariser that will explain it to you verbally in your native language!
+                </Text>
+              </Pressable>
+              <Pressable
+                onPress={() => {
+                  useStore.setState({ documentAnalysis: null, documentSummaryLines: null })
                 }}
                 className='bg-primary rounded-xl p-5 items-center justify-center'
               >

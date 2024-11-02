@@ -5,51 +5,52 @@ import {
   User,
 } from "@react-native-google-signin/google-signin";
 import { router } from "expo-router";
-import {
-  Content,
-  EnhancedGenerateContentResponse,
-  GenerateContentResult,
-  GoogleGenerativeAI,
-} from "@google/generative-ai";
+import { Content, GoogleGenerativeAI } from "@google/generative-ai";
 import RNFS from "react-native-fs";
-import { documentPrompt, imagePrompt } from "@/constants/prompts";
+import {
+  documentPrompt,
+  imagePrompt,
+  summaryPrompt,
+} from "@/utils/constants/prompts";
 import { GEMINI_API_KEY, WEB_CLIENT_ID } from "@/Keys";
 import { Alert } from "react-native";
+import { clearMarkdown } from "@/utils/utils";
 
 GoogleSignin.configure({
-  webClientId: WEB_CLIENT_ID
+  webClientId: WEB_CLIENT_ID,
 });
+const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 
 type state = {
   user: User | null;
   contextHistory: Content[];
-  documentAnalysis: DocumentAnalysis | null
+  documentAnalysis: DocumentAnalysis | null;
+  documentSummary: string | null;
+  documentSummaryLines: string[] | null;
 };
 
 type actions = {
   signIn: () => Promise<void>;
   signInSilent: () => Promise<void>;
   signOut: () => Promise<void>;
-  getGeminiResponse: (
-    prompt: string,
-    mediaType: string, // well, just "file" and "image" for now :)
-    media: string | null,
-    json?: boolean
-  ) => Promise<string>;
+  getDocumentAnalysis: (file: string) => Promise<void>;
+  getDocumentSummary: (lang: string) => Promise<void>;
 };
 
 type loaders = {
   signInSilentLoading: boolean;
-  geminiLoading: boolean
+  responseLoading: boolean;
 };
 
 const useStore = create<state & actions & loaders>((set, get) => ({
   user: null,
   contextHistory: [],
   documentAnalysis: null,
+  documentSummary: null,
+  documentSummaryLines: null,
 
   signInSilentLoading: false,
-  geminiLoading: false,
+  responseLoading: false,
 
   signIn: async () => {
     try {
@@ -89,20 +90,15 @@ const useStore = create<state & actions & loaders>((set, get) => ({
     }
   },
 
-  getGeminiResponse: async (
-    prompt: string,
-    mediaType: string,
-    media: string | null,
-    json: boolean = false
-  ): Promise<string> => {
+  getDocumentAnalysis: async (file: string) => {
     try {
-      set({geminiLoading: true})
+      set({ responseLoading: true });
+
       const history = get().contextHistory;
-      const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
       const model = genAI.getGenerativeModel({
         model: "gemini-1.5-flash",
         generationConfig: {
-          responseMimeType: json ? "application/json" : "text/plain",
+          responseMimeType: "application/json",
         },
       });
 
@@ -110,49 +106,53 @@ const useStore = create<state & actions & loaders>((set, get) => ({
         history: history,
       });
 
-      let result: GenerateContentResult;
+      const pdfData = await RNFS.readFile(file, "base64");
+      const pdf = {
+        inlineData: {
+          data: pdfData,
+          mimeType: "application/pdf",
+        },
+      };
 
-      if (mediaType === "file" && media) {
-        const pdfData = await RNFS.readFile(media, "base64");
-        const pdf = {
-          inlineData: {
-            data: pdfData,
-            mimeType: "application/pdf",
-          },
-        };
-        result = await chat.sendMessage([documentPrompt, pdf]);
-      } else if (mediaType === "image" && media) {
-        const fsImage = await RNFS.readFile(media, "base64");
-        const img = {
-          inlineData: {
-            data: fsImage,
-            mimeType: "image/png",
-          },
-        };
-        result = await chat.sendMessage([json ? imagePrompt : prompt, img]);
-      } else {
-        result = await chat.sendMessage(prompt);
-      }
-
+      const result = await chat.sendMessage([documentPrompt, pdf]);
       const response = result.response;
       const text = response.text();
 
-      if(mediaType==="file" && prompt===""){
-        try {
-          const documentAnalysis = JSON.parse(text)
-          set({documentAnalysis: documentAnalysis})
-        } catch (error) {
-          Alert.alert("Error Analysing Document, Please try again", error?.toString())
-        }
-      }
-
+      set({ documentAnalysis: JSON.parse(text) });
       set({ contextHistory: history });
-      return text;
     } catch (error) {
-      console.error(error);
-      return "";
+      Alert.alert("Error Getting Document Analysis", error?.toString());
     } finally {
-      set({geminiLoading: false})
+      set({ responseLoading: false });
+    }
+  },
+
+  getDocumentSummary: async (lang: string) => {
+    try {
+      set({ responseLoading: true });
+
+      const history = get().contextHistory;
+      const model = genAI.getGenerativeModel({
+        model: "gemini-1.5-flash",
+        generationConfig: {
+          responseMimeType: "text/plain",
+        },
+      });
+
+      const chat = model.startChat({
+        history: history,
+      });
+
+      const result = await chat.sendMessage(summaryPrompt(lang));
+      const response = result.response;
+      const text = response.text();
+      set({ documentSummary: text });
+      set({ contextHistory: history });
+      set({ documentSummaryLines: clearMarkdown(text).split("\n") });
+    } catch (error) {
+      Alert.alert("Error Getting Document Summary", error?.toString());
+    } finally {
+      set({ responseLoading: false });
     }
   },
 }));

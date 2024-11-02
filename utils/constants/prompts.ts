@@ -62,3 +62,7 @@ export const documentPrompt = `Analyze the following legal document and extract 
         }
         `;
 export const imagePrompt = ``
+
+export const summaryPrompt = (lang: string) => {
+  return ` LIMIT TO 600 WORDS ( IMPORTANT ) - Summarise that document in ${lang} Language, as if you are verbally Explaining it to someone, making it easier for him to understand all the necessary information along with risks associated with it`
+}

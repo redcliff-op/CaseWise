@@ -3,18 +3,15 @@ import React from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import useStore from '@/store/useStore'
 import Animated, { SharedTransition } from 'react-native-reanimated'
-import useUtilStore from '@/store/useUtilStore'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { router } from 'expo-router'
 import { useShallow } from 'zustand/shallow'
+import { getGreeting } from '@/utils/utils'
 
 const Home = () => {
 
   const [user] = useStore(
     useShallow((state) => [state.user])
-  )
-  const [getGreeting] = useUtilStore(
-    useShallow((state) => [state.getGreeting])
   )
 
   return (
@@ -22,7 +19,7 @@ const Home = () => {
       <View className=' items-center flex-row justify-between'>
         <View className='flex-row gap-2 items-center'>
           <Animated.Image
-            sharedTransitionTag={user?.user.email + "-image"}
+            //sharedTransitionTag={user?.user.email + "-image"}
             source={{ uri: user?.user.photo?.toString() }}
             className='w-[50] h-[50] rounded-full'
           />

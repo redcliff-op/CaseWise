@@ -1,6 +1,6 @@
 export const documentPrompt = `Analyze the following legal document and extract all key information that a user should know, including terms, obligations, conditions, and potential risks. Highlight any clauses or terms that could be unfavorable, hidden, or misleading, and flag them as 'concerning' or 'shady' if applicable. Summarize the key takeaways clearly and list any specific actions the user should take
         
-        Return the response the following JSON response and Please return in a format that can pe parsed by JSON in JavaScript, without any errors
+        Return the response the following JSON response WITHOUT ANY PARSING OR SYNTAX ERRORS 
 
         {
           \"document_name\": \"\",

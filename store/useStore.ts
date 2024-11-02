@@ -14,6 +14,7 @@ import {
 import RNFS from "react-native-fs";
 import { documentPrompt, imagePrompt } from "@/constants/prompts";
 import { GEMINI_API_KEY, WEB_CLIENT_ID } from "@/Keys";
+import { Alert } from "react-native";
 
 GoogleSignin.configure({
   webClientId: WEB_CLIENT_ID
@@ -22,6 +23,7 @@ GoogleSignin.configure({
 type state = {
   user: User | null;
   contextHistory: Content[];
+  documentAnalysis: DocumentAnalysis | null
 };
 
 type actions = {
@@ -38,13 +40,16 @@ type actions = {
 
 type loaders = {
   signInSilentLoading: boolean;
+  geminiLoading: boolean
 };
 
 const useStore = create<state & actions & loaders>((set, get) => ({
   user: null,
   contextHistory: [],
+  documentAnalysis: null,
 
   signInSilentLoading: false,
+  geminiLoading: false,
 
   signIn: async () => {
     try {
@@ -91,6 +96,7 @@ const useStore = create<state & actions & loaders>((set, get) => ({
     json: boolean = false
   ): Promise<string> => {
     try {
+      set({geminiLoading: true})
       const history = get().contextHistory;
       const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
       const model = genAI.getGenerativeModel({
@@ -131,11 +137,22 @@ const useStore = create<state & actions & loaders>((set, get) => ({
       const response = result.response;
       const text = response.text();
 
+      if(mediaType==="file" && prompt===""){
+        try {
+          const documentAnalysis = JSON.parse(text)
+          set({documentAnalysis: documentAnalysis})
+        } catch (error) {
+          Alert.alert("Error Analysing Document, Please try again", error?.toString())
+        }
+      }
+
       set({ contextHistory: history });
       return text;
     } catch (error) {
       console.error(error);
       return "";
+    } finally {
+      set({geminiLoading: false})
     }
   },
 }));

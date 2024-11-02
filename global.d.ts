@@ -1,3 +1,5 @@
+import { User } from "@react-native-google-signin/google-signin";
+
 interface Tab {
   name: string;
   icon: any;
@@ -63,4 +65,12 @@ interface DocumentAnalysis {
   review_recommendations: string | null;
   user_protection_tips: string | null;
   overall_analysis: string | null;
+}
+
+interface Preferences {
+  summaryLang: string;
+}
+
+interface UserData {
+  preferences: Preferences;
 }

@@ -7,14 +7,13 @@ import {
 import { router } from "expo-router";
 import { Content, GoogleGenerativeAI } from "@google/generative-ai";
 import RNFS from "react-native-fs";
-import {
-  documentPrompt,
-  imagePrompt,
-  summaryPrompt,
-} from "@/utils/constants/prompts";
+import { documentPrompt, summaryPrompt } from "@/utils/constants/prompts";
 import { GEMINI_API_KEY, WEB_CLIENT_ID } from "@/Keys";
 import { Alert } from "react-native";
 import { clearMarkdown } from "@/utils/utils";
+import { DocumentAnalysis, UserData } from "@/global";
+import firestore from "@react-native-firebase/firestore";
+import { defaultUserData } from "@/utils/constants/defaultUserData";
 
 GoogleSignin.configure({
   webClientId: WEB_CLIENT_ID,
@@ -23,6 +22,7 @@ const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 
 type state = {
   user: User | null;
+  userData: UserData;
   contextHistory: Content[];
   documentAnalysis: DocumentAnalysis | null;
   documentSummary: string | null;
@@ -35,6 +35,7 @@ type actions = {
   signOut: () => Promise<void>;
   getDocumentAnalysis: (file: string) => Promise<void>;
   getDocumentSummary: (lang: string) => Promise<void>;
+  syncUserData: () => Promise<void>;
 };
 
 type loaders = {
@@ -44,6 +45,7 @@ type loaders = {
 
 const useStore = create<state & actions & loaders>((set, get) => ({
   user: null,
+  userData: defaultUserData,
   contextHistory: [],
   documentAnalysis: null,
   documentSummary: null,
@@ -59,6 +61,20 @@ const useStore = create<state & actions & loaders>((set, get) => ({
       if (isSuccessResponse(response)) {
         set({ user: response?.data });
         router.navigate(`/Home`);
+        const userRef = firestore()
+          .collection("Users")
+          .doc(response.data.user.email.toString());
+        const userSnapshot = await userRef.get();
+        if (!userSnapshot.exists) {
+          await userRef.set({
+            preferences: {
+              summaryLang: "English",
+            },
+          });
+        } else {
+          const userData = await userSnapshot.data();
+          set({ userData: userData as UserData });
+        }
       }
     } catch (error) {
       console.log(error);
@@ -73,6 +89,12 @@ const useStore = create<state & actions & loaders>((set, get) => ({
       if (response.data) {
         set({ user: response.data });
         router.navigate(`/Home`);
+        const userRef = firestore()
+          .collection("Users")
+          .doc(response.data.user.email.toString());
+        const userSnapshot = await userRef.get();
+        const userData = await userSnapshot.data();
+        set({ userData: userData as UserData });
       }
     } catch (error) {
       console.log(error);
@@ -84,9 +106,26 @@ const useStore = create<state & actions & loaders>((set, get) => ({
       await GoogleSignin.signOut();
       router.dismissAll();
       await new Promise((resolve) => setTimeout(resolve, 500));
-      set({ user: null });
+      set({ user: null, userData: defaultUserData });
     } catch (error) {
       console.log(error);
+    }
+  },
+
+  syncUserData: async () => {
+    try {
+      const userRef = firestore()
+        .collection("Users")
+        .doc(get().user?.user.email.toString());
+      const userData = get().userData;
+      await userRef.update({
+        preferences: userData.preferences
+      });
+    } catch (error) {
+      Alert.alert(
+        "Unknown Firebase Error",
+        "Could not update user preferences"
+      );
     }
   },
 

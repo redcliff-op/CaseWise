@@ -15,13 +15,13 @@ import Slider from '@react-native-community/slider';
 
 const Summary = () => {
 
-  const [documentSummary, getDocumentSummary, responseLoading, lines] = useStore(
-    useShallow((state) => [state.documentSummary, state.getDocumentSummary, state.responseLoading, state.documentSummaryLines])
+  const [documentSummary, getDocumentSummary, responseLoading, lines, userData, syncUserData] = useStore(
+    useShallow((state) => [state.documentSummary, state.getDocumentSummary, state.responseLoading, state.documentSummaryLines, state.userData, state.syncUserData])
   );
 
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [playerExpanded, setPlayerExpanded] = useState<boolean>(false);
-  const [language, setLanguage] = useState<string>('English');
+  const [language, setLanguage] = useState<string>(userData.preferences.summaryLang);
   const [speechRate, setSpeechRate] = useState<number>(1);
   const [speechPitch, setSpeechPitch] = useState<number>(1);
   const [currentLine, setCurrentLine] = useState<number>(0);
@@ -65,6 +65,20 @@ const Summary = () => {
       setIsPlaying(true);
     }
   };
+
+  const handleLanguageChange = async(lang: string) => {
+    useStore.setState((state) => ({
+      userData: {
+        ...state.userData,
+        preferences: {
+          ...state.userData.preferences,
+          summaryLang: lang 
+        }
+      }
+    }));
+    setLanguage(lang)
+    await syncUserData()
+  }
 
   const animation = useRef(null);
 
@@ -140,20 +154,20 @@ const Summary = () => {
                       <Ionicons name={playerExpanded ? 'arrow-down' : 'arrow-up'} color={'white'} size={22} />
                     </Pressable>
                     {isPlaying ? (
-                        <View className='-my-5'>
-                          <LottieView
-                            source={require('../assets/raw/audio.json')}
-                            ref={animation}
-                            autoPlay
-                            loop
-                            style={{
-                              width: 70,
-                              height: 58,
-                              alignSelf: 'center',
-                            }}
-                          />
-                        </View>
-                    ): (
+                      <View className='-my-5'>
+                        <LottieView
+                          source={require('../assets/raw/audio.json')}
+                          ref={animation}
+                          autoPlay
+                          loop
+                          style={{
+                            width: 70,
+                            height: 58,
+                            alignSelf: 'center',
+                          }}
+                        />
+                      </View>
+                    ) : (
                       <Text className='text-background text-lg font-bold'>Start Oral Recitation!</Text>
                     )}
                   </View>
@@ -225,7 +239,7 @@ const Summary = () => {
                 <View className='rounded-full bg-secondary p-3'>
                   <Picker
                     selectedValue={language}
-                    onValueChange={setLanguage}
+                    onValueChange={(lang)=>handleLanguageChange(lang)}
                     selectionColor={'#EBD9CD'}
                     dropdownIconColor={'#241C1A'}
                     dropdownIconRippleColor={'#EBD9CD'}

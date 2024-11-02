@@ -8,6 +8,7 @@ import * as NavigationBar from 'expo-navigation-bar';
 import { View, StatusBar } from 'react-native';
 import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
 import TabButton from '../components/TabButton';
+import { Tab } from '@/global';
 
 SplashScreen.preventAutoHideAsync();
 

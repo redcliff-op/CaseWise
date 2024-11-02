@@ -9,6 +9,7 @@ import Ionicons from '@expo/vector-icons/Ionicons'
 import Collapsible from 'react-native-collapsible'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 import { router } from 'expo-router'
+import { ActionItem, KeyTerms, Obligation, RiskEntry, ShadyClause } from '@/global'
 
 
 const Documents = () => {
@@ -112,7 +113,7 @@ const Documents = () => {
                       }}
                     />
                   </View>
-                  {response.parties_involved?.map((item, index) =>
+                  {response.parties_involved?.map((item: any, index: number) =>
                     <View className='bg-background mx-2 my-1 p-4 rounded-lg'>
                       <Text className='font-semibold'>{index + 1}: {item}</Text>
                     </View>
@@ -134,7 +135,7 @@ const Documents = () => {
                   <Collapsible collapsed={!termsExpanded} >
                     <View className='px-5 pb-5 gap-2'>
                       {response.key_terms.description ? <Text className='text-background font-semibold'>{response.key_terms.description}</Text> : null}
-                      {response.key_terms.terms?.map((item, index) =>
+                      {response.key_terms.terms?.map((item: any, index: number) =>
                         <View className='bg-background mb-2 p-2 rounded-lg gap-2'>
                           {item.term ? <Text className='font-semibold text-primary'>Term: <Text className='font-normal text-black'>{item.term}</Text></Text> : null}
                           {item.importance ? <Text className='font-semibold text-primary'>Importance: <Text className='font-normal text-black'>{item.importance}</Text></Text> : null}
@@ -158,7 +159,7 @@ const Documents = () => {
                   </View>
                   <Collapsible collapsed={!obligationsExpanded} >
                     <View className='px-5 pb-5 gap-2'>
-                      {response.obligations?.map((item, index) =>
+                      {response.obligations?.map((item: Obligation, index: number) =>
                         <View className='bg-background mb-2 p-2 rounded-lg gap-2'>
                           {item.obligation ? <Text className='font-semibold text-primary'>Obligation: <Text className='font-normal text-black'>{item.obligation}</Text></Text> : null}
                           {item.description ? <Text className='font-semibold text-primary'>Description: <Text className='font-normal text-black'>{item.description}</Text></Text> : null}
@@ -310,7 +311,7 @@ const Documents = () => {
                   </View>
                   <Collapsible collapsed={!clausesExpanded} >
                     <View className='px-5 pb-5 gap-2'>
-                      {response.shady_clauses?.map((item) =>
+                      {response.shady_clauses?.map((item: ShadyClause) =>
                         <View className='bg-background mb-2 p-2 rounded-lg gap-2'>
                           {item.clause ? <Text className='font-semibold text-primary'>Clause: <Text className='font-normal text-black'>{item.clause}</Text></Text> : null}
                           {item.description ? <Text className='font-semibold text-primary'>Description: <Text className='font-normal text-black'>{item.description}</Text></Text> : null}
@@ -336,7 +337,7 @@ const Documents = () => {
                   </View>
                   <Collapsible collapsed={!actionItemsExpanded} >
                     <View className='px-5 pb-5 gap-2'>
-                      {response.action_items?.map((item) =>
+                      {response.action_items?.map((item: ActionItem) =>
                         <View className='bg-background mb-2 p-2 rounded-lg gap-2'>
                           {item.action ? <Text className='font-semibold text-primary'>Action: <Text className='font-normal text-black'>{item.action}</Text></Text> : null}
                           {item.deadline ? <Text className='font-semibold text-primary'>Deadline: <Text className='font-normal text-black'>{item.deadline}</Text></Text> : null}
@@ -360,7 +361,7 @@ const Documents = () => {
                   </View>
                   <Collapsible collapsed={!terminationExpanded} >
                     <View className='px-5 pb-5 gap-2'>
-                      {response.termination_conditions?.map((item) =>
+                      {response.termination_conditions?.map((item: any) =>
                         <View className='bg-background mb-2 p-2 rounded-lg gap-2'>
                           <Text className='text-primary'>{item}</Text>
                         </View>

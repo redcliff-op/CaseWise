@@ -41,7 +41,7 @@ const RootLayout: React.FC = () => {
   NavigationBar.setBackgroundColorAsync("#F4EEE4");
   StatusBar.setBarStyle("dark-content");
 
-  const screensWithoutNav = ['Profile', 'index', 'Summary'];
+  const screensWithoutNav = ['Profile', 'index', 'Summary','Chat'];
   const shouldShowNav = (segments.length>=1) ? !segments.some(segment => screensWithoutNav.includes(segment)):null
 
   return (
@@ -70,6 +70,7 @@ const RootLayout: React.FC = () => {
         <Stack.Screen name="Home" options={{ animation: 'flip' }} />
         <Stack.Screen name="Documents" options={{ animation: 'flip' }} />
         <Stack.Screen name="Summary" options={{ animation: 'flip' }} />
+        <Stack.Screen name="Chat" options={{ animation: 'flip' }} />
         <Stack.Screen name="Profile" options={{ animation: 'ios' }} />
       </Stack>
     </View>

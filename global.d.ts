@@ -74,3 +74,9 @@ interface Preferences {
 interface UserData {
   preferences: Preferences;
 }
+
+interface ChatItem {
+  ai: boolean;
+  message: string;
+  time: string;
+}

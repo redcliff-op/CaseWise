@@ -11,7 +11,7 @@ import { documentPrompt, summaryPrompt } from "@/utils/constants/prompts";
 import { GEMINI_API_KEY, WEB_CLIENT_ID } from "@/Keys";
 import { Alert } from "react-native";
 import { clearMarkdown } from "@/utils/utils";
-import { DocumentAnalysis, UserData } from "@/global";
+import { ChatItem, DocumentAnalysis, UserData } from "@/global";
 import firestore from "@react-native-firebase/firestore";
 import { defaultUserData } from "@/utils/constants/defaultUserData";
 
@@ -27,6 +27,7 @@ type state = {
   documentAnalysis: DocumentAnalysis | null;
   documentSummary: string | null;
   documentSummaryLines: string[] | null;
+  messageList: ChatItem[];
 };
 
 type actions = {
@@ -35,6 +36,7 @@ type actions = {
   signOut: () => Promise<void>;
   getDocumentAnalysis: (file: string) => Promise<void>;
   getDocumentSummary: (lang: string) => Promise<void>;
+  getChatResponse: (chatItem: ChatItem) => Promise<void>;
   syncUserData: () => Promise<void>;
 };
 
@@ -50,6 +52,7 @@ const useStore = create<state & actions & loaders>((set, get) => ({
   documentAnalysis: null,
   documentSummary: null,
   documentSummaryLines: null,
+  messageList: [],
 
   signInSilentLoading: false,
   responseLoading: false,
@@ -119,7 +122,7 @@ const useStore = create<state & actions & loaders>((set, get) => ({
         .doc(get().user?.user.email.toString());
       const userData = get().userData;
       await userRef.update({
-        preferences: userData.preferences
+        preferences: userData.preferences,
       });
     } catch (error) {
       Alert.alert(
@@ -190,6 +193,47 @@ const useStore = create<state & actions & loaders>((set, get) => ({
       set({ documentSummaryLines: clearMarkdown(text).split("\n") });
     } catch (error) {
       Alert.alert("Error Getting Document Summary", error?.toString());
+    } finally {
+      set({ responseLoading: false });
+    }
+  },
+
+  getChatResponse: async (chatItem: ChatItem) => {
+    try {
+      set({ responseLoading: true });
+
+      const history = get().contextHistory;
+      const model = genAI.getGenerativeModel({
+        model: "gemini-1.5-flash",
+        generationConfig: {
+          responseMimeType: "text/plain",
+        },
+      });
+
+      const chat = model.startChat({
+        history: history,
+      });
+
+      const result = await chat.sendMessage(chatItem.message);
+      const response = result.response;
+      const text = response.text();
+
+      set({
+        messageList: [
+          ...get().messageList,
+          {
+            ai: true,
+            message: text.trimEnd(),
+            time: new Date().toLocaleTimeString().slice(0, -3),
+          },
+        ],
+      });
+
+    } catch (error) {
+      Alert.alert(
+        "Unknown Lawbot Error",
+        "Failed to get a response, please try again"
+      );
     } finally {
       set({ responseLoading: false });
     }

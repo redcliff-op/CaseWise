@@ -179,20 +179,19 @@ const Summary = () => {
                   </Pressable>
                 </View>
               </Animated.View>
-              <ScrollView showsVerticalScrollIndicator={false}>
+              <ScrollView showsVerticalScrollIndicator={false} className='-mx-2'>
                 {lines?.map((line, index) => (
                   <Animated.View
                     key={index}
-                    className='rounded-xl px-2'
+                    className='rounded-xl px-4'
                     style={{
-                      backgroundColor: (index === currentLine) ? "#EBD9CD" : '#F4EEE4'
+                      backgroundColor: (index === currentLine) ? "#507680" : '#F4EEE4'
                     }}
                   >
                     <Markdown style={{
                       text: {
-                        color: (index === currentLine) ? '#507680' : '#452B01',
-                        fontSize: 17,
-                        fontWeight: (index === currentLine) ? 'bold' : 'normal'
+                        color: (index === currentLine) ? '#F4EEE4' : '#452B01',
+                        fontSize: 17
                       }
                     }}
                     >{line}</Markdown>
@@ -215,7 +214,7 @@ const Summary = () => {
           ) : (
             <View className='justify-between flex-1'>
               <View >
-                <Text className='text-primary text-2xl font-bold'>
+                <Text className='text-primary text-xl font-bold'>
                   Multilingual Document Summary!
                 </Text>
                 <Text className='text-black'>

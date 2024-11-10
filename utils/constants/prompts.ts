@@ -1,3 +1,5 @@
+import { DocumentAnalysis } from "@/global";
+
 export const documentPrompt = `Analyze the following legal document and extract all key information that a user should know, including terms, obligations, conditions, and potential risks. Highlight any clauses or terms that could be unfavorable, hidden, or misleading, and flag them as 'concerning' or 'shady' if applicable. Summarize the key takeaways clearly and list any specific actions the user should take
         
         Return the response the following JSON response WITHOUT ANY PARSING OR SYNTAX ERRORS 
@@ -63,6 +65,8 @@ export const documentPrompt = `Analyze the following legal document and extract 
         `;
 export const imagePrompt = ``
 
-export const summaryPrompt = (lang: string) => {
-  return ` LIMIT TO 600 WORDS ( IMPORTANT ) - Summarise that document in ${lang} Language, as if you are verbally Explaining it to someone, making it easier for him to understand all the necessary information along with risks associated with it`
+export const summaryPrompt = (lang: string, document: DocumentAnalysis) => {
+  return ` LIMIT TO 600 WORDS ( IMPORTANT ) - Summarise this legal document in ${lang} Language, as if you are verbally Explaining it to someone, making it easier for him to understand all the necessary information along with risks associated with it, here is the document ${JSON.stringify(document)}`
 }
+
+export const initialPrompt = `REMEMBER that your name is CaseWise LawBot and you are supposed to answer law or legal related questions or requests ONLY, apart from this if user asks anything else just reply with "I am Sorry, CaseWise LawBot is only limited to provide legal and law related help!"`;

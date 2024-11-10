@@ -1,5 +1,5 @@
 import { View, Text, Pressable } from 'react-native'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import useStore from '@/store/useStore'
 import Animated, { SharedTransition } from 'react-native-reanimated'
@@ -10,9 +10,13 @@ import { getGreeting } from '@/utils/utils'
 
 const Home = () => {
 
-  const [user] = useStore(
-    useShallow((state) => [state.user])
+  const [user, loadInitialPromopt] = useStore(
+    useShallow((state) => [state.user, state.loadInitialPrompt])
   )
+
+  useEffect(()=>{
+    loadInitialPromopt()
+  },[])
 
   return (
     <SafeAreaView className='flex-1 px-4 bg-background'>

@@ -80,3 +80,14 @@ interface ChatItem {
   message: string;
   time: string;
 }
+
+interface CasePrediction {
+  predictedOutcome: string | null;
+  predictionConfidence: string | null;
+  keyFactors: string[] | null; 
+  improvementStrategies: string[] | null;
+  riskLevel: string | null;
+  potentialRewards: string | null; 
+  uncertaintyFactors: string[] | null;
+  successRate: number | null; 
+}

@@ -9,7 +9,7 @@ import Ionicons from '@expo/vector-icons/Ionicons'
 import Collapsible from 'react-native-collapsible'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 import { router } from 'expo-router'
-import { ActionItem, KeyTerms, Obligation, RiskEntry, ShadyClause } from '@/global'
+import { ActionItem, Obligation, RiskEntry, ShadyClause } from '@/global'
 
 
 const Documents = () => {

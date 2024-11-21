@@ -10,12 +10,13 @@ import RNFS from "react-native-fs";
 import {
   documentPrompt,
   initialPrompt,
+  predictionPrompt,
   summaryPrompt,
 } from "@/utils/constants/prompts";
 
 import { Alert } from "react-native";
 import { clearMarkdown } from "@/utils/utils";
-import { ChatItem, DocumentAnalysis, UserData } from "@/global";
+import { CasePrediction, ChatItem, DocumentAnalysis, UserData } from "@/global";
 import firestore from "@react-native-firebase/firestore";
 import { defaultUserData } from "@/utils/constants/defaultUserData";
 import { WEB_CLIENT_ID, GEMINI_API_KEY } from "@/Keys";
@@ -33,6 +34,7 @@ type state = {
   documentAnalysis: DocumentAnalysis | null;
   documentSummary: string | null;
   documentSummaryLines: string[] | null;
+  casePrediction: CasePrediction | null;
   messageList: ChatItem[];
 };
 
@@ -43,6 +45,7 @@ type actions = {
   getDocumentAnalysis: (file: string) => Promise<void>;
   getDocumentSummary: (lang: string) => Promise<void>;
   getChatResponse: (chatItem: ChatItem) => Promise<void>;
+  getCasePrediction: (file: string) => Promise<void>;
   loadInitialPrompt: () => Promise<void>;
   syncUserData: () => Promise<void>;
 };
@@ -60,6 +63,7 @@ const useStore = create<state & actions & loaders>((set, get) => ({
   documentSummary: null,
   documentSummaryLines: null,
   messageList: [],
+  casePrediction: null,
 
   signInSilentLoading: false,
   responseLoading: false,
@@ -233,10 +237,7 @@ const useStore = create<state & actions & loaders>((set, get) => ({
         ],
       });
     } catch (error) {
-      Alert.alert(
-        "Unknown Lawbot Error",
-        error as string
-      );
+      Alert.alert("Unknown Lawbot Error", error as string);
     } finally {
       set({ responseLoading: false });
     }
@@ -262,6 +263,43 @@ const useStore = create<state & actions & loaders>((set, get) => ({
       set({ contextHistory: history });
     } catch (error) {
       alert(error);
+    } finally {
+      set({ responseLoading: false });
+    }
+  },
+
+  getCasePrediction: async (file: string) => {
+    try {
+      set({ responseLoading: true });
+
+      const history = get().contextHistory;
+      const model = genAI.getGenerativeModel({
+        model: GEMINI_MODEL,
+        generationConfig: {
+          responseMimeType: "application/json",
+        },
+      });
+
+      const chat = model.startChat({
+        history: history,
+      });
+
+      const pdfData = await RNFS.readFile(file, "base64");
+      const pdf = {
+        inlineData: {
+          data: pdfData,
+          mimeType: "application/pdf",
+        },
+      };
+
+      const result = await chat.sendMessage([predictionPrompt, pdf]);
+      const response = result.response;
+      const text = response.text();
+
+      set({ casePrediction: JSON.parse(text) });
+      set({ contextHistory: history });
+    } catch (error) {
+      Alert.alert("Error Getting Case Prediction", error?.toString());
     } finally {
       set({ responseLoading: false });
     }

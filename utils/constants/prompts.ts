@@ -63,10 +63,34 @@ export const documentPrompt = `Analyze the following legal document and extract 
           \"overall_analysis\": \"\"
         }
         `;
-export const imagePrompt = ``
+export const imagePrompt = ``;
 
 export const summaryPrompt = (lang: string, document: DocumentAnalysis) => {
-  return ` LIMIT TO 600 WORDS ( IMPORTANT ) - Summarise this legal document in ${lang} Language, as if you are verbally Explaining it to someone, making it easier for him to understand all the necessary information along with risks associated with it, here is the document ${JSON.stringify(document)}`
-}
+  return ` LIMIT TO 600 WORDS ( IMPORTANT ) - Summarise this legal document in ${lang} Language, as if you are verbally Explaining it to someone, making it easier for him to understand all the necessary information along with risks associated with it, here is the document ${JSON.stringify(
+    document
+  )}`;
+};
 
 export const initialPrompt = `REMEMBER that your name is CaseWise LawBot and you are supposed to answer law or legal related questions or requests ONLY, apart from this if user asks anything else just reply with "I am Sorry, CaseWise LawBot is only limited to provide legal and law related help!"`;
+
+export const predictionPrompt = `Analyze the given case scenario and provide a detailed prediction with all relevant insights. Include factors influencing the prediction, potential improvement strategies, associated risks, potential rewards, estimated cost, timeline, and any uncertainties affecting the prediction
+
+Return the response in the following JSON response WITHOUT ANY PARSING OR SYNTAX ERRORS:
+
+        {
+          \"predictedOutcome\": \"\",
+          \"predictionConfidence\": "Low" | "Medium" | "High",
+          \"keyFactors\": [
+            \"\"
+          ],
+          \"improvementStrategies\": [
+            \"\"
+          ],
+          \"riskLevel\":  "Low" | "Medium" | "High",
+          \"potentialRewards\": \"\",
+          \"uncertaintyFactors\": [
+            \"\"
+          ],
+          \"successRate\": \"\"
+        }
+`;

@@ -2,7 +2,8 @@ import { View, Text, Pressable } from 'react-native'
 import React, { useEffect } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import useStore from '@/store/useStore'
-import Animated, { SharedTransition } from 'react-native-reanimated'
+import Animated from 'react-native-reanimated'
+
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { router } from 'expo-router'
 import { useShallow } from 'zustand/shallow'
@@ -15,7 +16,7 @@ const Home = () => {
   )
 
   useEffect(()=>{
-    loadInitialPromopt()
+    //loadInitialPromopt()
   },[])
 
   return (

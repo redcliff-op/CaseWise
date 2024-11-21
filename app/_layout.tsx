@@ -71,6 +71,7 @@ const RootLayout: React.FC = () => {
         <Stack.Screen name="Documents" options={{ animation: 'flip' }} />
         <Stack.Screen name="Summary" options={{ animation: 'flip' }} />
         <Stack.Screen name="Chat" options={{ animation: 'flip' }} />
+        <Stack.Screen name="Prediction" options={{ animation: 'flip' }} />
         <Stack.Screen name="Profile" options={{ animation: 'ios' }} />
       </Stack>
     </View>

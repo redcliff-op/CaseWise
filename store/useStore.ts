@@ -12,12 +12,14 @@ import {
   initialPrompt,
   summaryPrompt,
 } from "@/utils/constants/prompts";
-import { GEMINI_API_KEY, WEB_CLIENT_ID } from "@/Keys";
+
 import { Alert } from "react-native";
 import { clearMarkdown } from "@/utils/utils";
 import { ChatItem, DocumentAnalysis, UserData } from "@/global";
 import firestore from "@react-native-firebase/firestore";
 import { defaultUserData } from "@/utils/constants/defaultUserData";
+import { WEB_CLIENT_ID, GEMINI_API_KEY } from "@/Keys";
+import { GEMINI_MODEL } from "@/utils/constants/ModelConfig";
 
 GoogleSignin.configure({
   webClientId: WEB_CLIENT_ID,
@@ -143,7 +145,7 @@ const useStore = create<state & actions & loaders>((set, get) => ({
 
       const history = get().contextHistory;
       const model = genAI.getGenerativeModel({
-        model: "gemini-1.5-flash",
+        model: GEMINI_MODEL,
         generationConfig: {
           responseMimeType: "application/json",
         },
@@ -178,7 +180,7 @@ const useStore = create<state & actions & loaders>((set, get) => ({
     set({ responseLoading: true });
     try {
       const model = genAI.getGenerativeModel({
-        model: "gemini-1.5-flash",
+        model: GEMINI_MODEL,
         generationConfig: {
           responseMimeType: "text/plain",
         },
@@ -186,7 +188,9 @@ const useStore = create<state & actions & loaders>((set, get) => ({
 
       const chat = model.startChat({});
 
-      const result = await chat.sendMessage(summaryPrompt(lang, get().documentAnalysis!!));
+      const result = await chat.sendMessage(
+        summaryPrompt(lang, get().documentAnalysis!!)
+      );
       const response = result.response;
       const text = response.text();
       set({ documentSummary: text });
@@ -204,7 +208,7 @@ const useStore = create<state & actions & loaders>((set, get) => ({
 
       const history = get().contextHistory;
       const model = genAI.getGenerativeModel({
-        model: "gemini-1.5-flash",
+        model: GEMINI_MODEL,
         generationConfig: {
           responseMimeType: "text/plain",
         },
@@ -231,7 +235,7 @@ const useStore = create<state & actions & loaders>((set, get) => ({
     } catch (error) {
       Alert.alert(
         "Unknown Lawbot Error",
-        "Failed to get a response, please try again"
+        error as string
       );
     } finally {
       set({ responseLoading: false });
@@ -244,7 +248,7 @@ const useStore = create<state & actions & loaders>((set, get) => ({
 
       const history = get().contextHistory;
       const model = genAI.getGenerativeModel({
-        model: "gemini-1.5-flash",
+        model: GEMINI_MODEL,
         generationConfig: {
           responseMimeType: "text/plain",
         },
@@ -257,7 +261,7 @@ const useStore = create<state & actions & loaders>((set, get) => ({
       await chat.sendMessage(initialPrompt);
       set({ contextHistory: history });
     } catch (error) {
-      alert("Unknown Lawbot Error");
+      alert(error);
     } finally {
       set({ responseLoading: false });
     }

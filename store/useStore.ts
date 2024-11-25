@@ -10,13 +10,14 @@ import RNFS from "react-native-fs";
 import {
   documentPrompt,
   initialPrompt,
+  newCasePrompt,
   predictionPrompt,
   summaryPrompt,
 } from "@/utils/constants/prompts";
 
 import { Alert } from "react-native";
 import { clearMarkdown } from "@/utils/utils";
-import { CasePrediction, ChatItem, DocumentAnalysis, UserData } from "@/global";
+import { CaseData, CaseFiling, CasePrediction, ChatItem, DocumentAnalysis, UserData } from "@/global";
 import firestore from "@react-native-firebase/firestore";
 import { defaultUserData } from "@/utils/constants/defaultUserData";
 import { WEB_CLIENT_ID, GEMINI_API_KEY } from "@/Keys";
@@ -36,6 +37,8 @@ type state = {
   documentSummaryLines: string[] | null;
   casePrediction: CasePrediction | null;
   messageList: ChatItem[];
+  caseList: CaseData[]
+  currentCase: CaseData | null;
 };
 
 type actions = {
@@ -48,6 +51,7 @@ type actions = {
   getCasePrediction: (file: string) => Promise<void>;
   loadInitialPrompt: () => Promise<void>;
   syncUserData: () => Promise<void>;
+  initNewCase: (title:string, description: string) => Promise<void>
 };
 
 type loaders = {
@@ -64,6 +68,8 @@ const useStore = create<state & actions & loaders>((set, get) => ({
   documentSummaryLines: null,
   messageList: [],
   casePrediction: null,
+  caseList: [],
+  currentCase: null,
 
   signInSilentLoading: false,
   responseLoading: false,
@@ -304,6 +310,42 @@ const useStore = create<state & actions & loaders>((set, get) => ({
       set({ responseLoading: false });
     }
   },
+  initNewCase: async (title: string, description: string) => {
+    try {
+      set({ responseLoading: true });
+
+      const history = get().contextHistory;
+      const model = genAI.getGenerativeModel({
+        model: GEMINI_MODEL,
+        generationConfig: {
+          responseMimeType: "application/json",
+        },
+      });
+
+      const chat = model.startChat({
+        history: history,
+      });
+
+      const result = await chat.sendMessage(newCasePrompt(title, description));
+      const response = result.response;
+      const text = response.text();
+
+      const caseFiling: CaseFiling = JSON.parse(text) as CaseFiling;
+      const caseData: CaseData = {
+        caseFiling: caseFiling,
+        evidenceCollection: null,
+        legalResearch: null,
+        hearingManagement: null
+      }
+      set({caseList: [...get().caseList,caseData], currentCase: caseData})
+      set({ contextHistory: history });
+      console.log(caseFiling)
+    } catch (error) {
+      Alert.alert("Error Initiating a new case", error?.toString());
+    } finally {
+      set({ responseLoading: false });
+    }
+  }
 }));
 
 export default useStore;

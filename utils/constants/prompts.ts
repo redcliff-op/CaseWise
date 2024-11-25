@@ -94,3 +94,30 @@ Return the response in the following JSON response WITHOUT ANY PARSING OR SYNTAX
           \"successRate\": \"\"
         }
 `;
+
+export const newCasePrompt = (caseTitle: string, caseDesc: string): string => {
+  return `
+  Based on the provided case details:
+
+  Title: ${caseTitle}
+  Description: ${caseDesc}
+
+  Extract the following information:
+
+  Provide the output in JSON format adhering to the following interface:
+  {
+    \"caseTitle\": \"\",
+    \"clientDetails\": {
+      \"name\": \"\",
+      \"contact\": \"\",
+      \"email\": \"\",
+      \"address\": \"\"
+    },
+    \"caseType\": \"Civil\" | \"Criminal\" | \"Corporate\" | \"Family\" | \"Other\",
+    \"filingDate\": \"\",
+    \"jurisdiction\": \"\",
+    \"documentsRequired\": [\"\"],
+    \"status\": \"Draft\" | \"Submitted\" | \"Rejected\",
+  }
+  `;
+};

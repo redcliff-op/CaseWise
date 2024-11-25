@@ -91,3 +91,73 @@ interface CasePrediction {
   uncertaintyFactors: string[] | null;
   successRate: number | null; 
 }
+
+interface CaseFiling {
+  caseTitle: string;
+  clientDetails: {
+    name: string;
+    contact: string;
+    email: string;
+    address?: string;
+  };
+  caseType: "Civil" | "Criminal" | "Corporate" | "Family" | "Other";
+  filingDate: string; 
+  jurisdiction: string;
+  documentsRequired: string[];
+  status: "Draft" | "Submitted" | "Rejected";
+}
+
+interface EvidenceCollection {
+  evidenceId: string;
+  evidenceType: "Physical" | "Digital" | "Witness Statement" | "Other";
+  description: string;
+  uploadedBy: string;
+  uploadDate: string;
+  fileUrl?: string;
+  verificationStatus: "Pending" | "Verified" | "Rejected";
+}
+
+interface LegalResearch {
+  researchId: string;
+  topic: string;
+  notes: string;
+  relatedLaws: string[];
+  precedentCases: {
+    caseTitle: string;
+    caseSummary: string;
+    rulingDate: string;
+    court: string;
+  }[];
+  completionStatus: "In Progress" | "Completed";
+}
+
+interface HearingManagement {
+  hearingId: string;
+  hearingDate: string;
+  courtName: string;
+  judgeName: string;
+  agenda: string;
+  outcome?: string;
+  documentsRequired: string[];
+  rescheduleDetails?: {
+    rescheduledDate: string;
+    reason: string;
+  };
+}
+
+interface CaseResolution {
+  resolutionId: string;
+  resolutionDate: string;
+  outcome: "Won" | "Lost" | "Settled" | "Withdrawn";
+  summary: string;
+  judgmentCopyUrl?: string; 
+  followUpActions: string[];
+}
+
+interface CaseData {
+  caseFiling: CaseFiling;
+  evidenceCollection: EvidenceCollection[] | null;
+  legalResearch: LegalResearch[] | null;
+  hearingManagement: HearingManagement[] | null;
+  caseResolution?: CaseResolution | null;
+}

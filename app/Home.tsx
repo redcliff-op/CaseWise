@@ -1,23 +1,26 @@
-import { View, Text, Pressable } from 'react-native'
-import React, { useEffect } from 'react'
+import { View, Text, Pressable, Dimensions } from 'react-native'
+import React, { useEffect, useRef } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import useStore from '@/store/useStore'
-import Animated from 'react-native-reanimated'
+import Animated, { FadeIn, FadeInDown, FadeOut, FadeOutDown } from 'react-native-reanimated'
 
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { router } from 'expo-router'
 import { useShallow } from 'zustand/shallow'
 import { getGreeting } from '@/utils/utils'
+import LottieView from 'lottie-react-native'
 
 const Home = () => {
 
-  const [user, loadInitialPromopt] = useStore(
-    useShallow((state) => [state.user, state.loadInitialPrompt])
+  const [user, loadInitialPromopt, caseList] = useStore(
+    useShallow((state) => [state.user, state.loadInitialPrompt, state.caseList])
   )
 
-  useEffect(()=>{
+  useEffect(() => {
     //loadInitialPromopt()
-  },[])
+  }, [])
+
+  const animation = useRef(null)
 
   return (
     <SafeAreaView className='flex-1 px-4 bg-background'>
@@ -42,6 +45,32 @@ const Home = () => {
           <Ionicons name='person' size={25} />
         </Pressable>
       </View>
+      <View className='flex-1 '>
+        {caseList.length === 0 ?
+          <View className='justify-center flex-1 pb-40 px-5'>
+            <Text className='text-darkbg text-2xl font-semibold'>
+              No Ongoing Cases!
+            </Text>
+            <Text className='text-gray-600 text-lg font'>
+              Click on the add button to get assistance for any of your legal cases!
+            </Text>
+          </View>
+          :
+          <>
+            {caseList.map((item)=>
+              <Text>{item.caseFiling.caseTitle}</Text>
+            )}
+          </>
+        }
+      </View>
+      <Pressable
+        onPress={()=>{
+          router.navigate("/NewCase")
+        }}
+        className='absolute p-4 bg-primary bottom-24 right-10 rounded-full'
+      >
+        <Ionicons name='add' color={'white'} size={30} />
+      </Pressable>
     </SafeAreaView>
   )
 }

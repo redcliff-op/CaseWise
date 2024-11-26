@@ -108,13 +108,10 @@ interface CaseFiling {
 }
 
 interface EvidenceCollection {
-  evidenceId: string;
   evidenceType: "Physical" | "Digital" | "Witness Statement" | "Other";
+  title: string,
   description: string;
-  uploadedBy: string;
   uploadDate: string;
-  fileUrl?: string;
-  verificationStatus: "Pending" | "Verified" | "Rejected";
 }
 
 interface LegalResearch {
@@ -155,6 +152,7 @@ interface CaseResolution {
 }
 
 interface CaseData {
+  navigateStatus: number,
   caseFiling: CaseFiling;
   evidenceCollection: EvidenceCollection[] | null;
   legalResearch: LegalResearch[] | null;

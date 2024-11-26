@@ -18,7 +18,7 @@ const NewCase = () => {
   const animation = useRef(null)
 
   const handleInitNewCase = async () => {
-    if (!(title || description)) {
+    if (!(title && description)) {
       Alert.alert("Insufficient information", "Kindly fill all the details given below")
       return;
     }

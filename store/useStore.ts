@@ -332,10 +332,12 @@ const useStore = create<state & actions & loaders>((set, get) => ({
 
       const caseFiling: CaseFiling = JSON.parse(text) as CaseFiling;
       const caseData: CaseData = {
+        navigateStatus: 0,
         caseFiling: caseFiling,
-        evidenceCollection: null,
-        legalResearch: null,
-        hearingManagement: null
+        evidenceCollection: [],
+        legalResearch: [],
+        hearingManagement: [],
+        caseResolution: null
       }
       set({caseList: [...get().caseList,caseData], currentCase: caseData})
       set({ contextHistory: history });

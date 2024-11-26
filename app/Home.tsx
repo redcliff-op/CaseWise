@@ -57,14 +57,23 @@ const Home = () => {
           </View>
           :
           <>
-            {caseList.map((item)=>
-              <Text>{item.caseFiling.caseTitle}</Text>
+            {caseList.map((item) =>
+              <Pressable
+                onPress={() => {
+                  useStore.setState({ currentCase: item })
+                  router.navigate("/CaseNavigator")
+                }}
+              >
+                <Text>
+                  {item.caseFiling.caseTitle}
+                </Text>
+              </Pressable>
             )}
           </>
         }
       </View>
       <Pressable
-        onPress={()=>{
+        onPress={() => {
           router.navigate("/NewCase")
         }}
         className='absolute p-4 bg-primary bottom-24 right-10 rounded-full'

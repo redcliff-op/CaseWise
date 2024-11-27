@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import Collapsible from 'react-native-collapsible'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { router } from 'expo-router'
+import Markdown from 'react-native-markdown-display'
 
 const Hearing = () => {
 
@@ -92,7 +93,17 @@ const Hearing = () => {
       >
         <Collapsible collapsed={!advice}>
           <ScrollView>
-            <Text className='text-background'>{advice}</Text>
+            <Markdown
+              style={{
+                text: {
+                  fontSize:15,
+                  color: 'white',
+                  fontWeight: 'semibold',
+                }
+              }}
+            >
+             {advice} 
+            </Markdown>
           </ScrollView>
         </Collapsible>
         {responseLoading ?

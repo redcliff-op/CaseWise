@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import 'react-native-reanimated';
 import "../global.css";
 import * as NavigationBar from 'expo-navigation-bar';
-import { View, StatusBar } from 'react-native';
+import { View, StatusBar, AppState } from 'react-native';
 import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
 import TabButton from '../components/TabButton';
 import { Tab } from '@/global';
@@ -37,6 +37,7 @@ const RootLayout: React.FC = () => {
   if (!loaded) {
     return null;
   }
+
 
   NavigationBar.setBackgroundColorAsync("#F4EEE4");
   StatusBar.setBarStyle("dark-content");

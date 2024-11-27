@@ -2,6 +2,7 @@ import { UserData } from "@/global";
 
 export const defaultUserData: UserData = {
   preferences: {
-    summaryLang: "English"
-  }
+    summaryLang: "English",
+  },
+  caseList: []
 }

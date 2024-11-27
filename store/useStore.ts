@@ -63,7 +63,7 @@ type actions = {
   syncUserData: () => Promise<void>;
   initNewCase: (title: string, description: string) => Promise<void>;
   getLegalResearch: (caseData: CaseData) => Promise<void>;
-  getHearingAdvice: (caseData: CaseData) => Promise<string>
+  getHearingAdvice: (caseData: CaseData) => Promise<string>;
 };
 
 type loaders = {
@@ -102,10 +102,14 @@ const useStore = create<state & actions & loaders>((set, get) => ({
             preferences: {
               summaryLang: "English",
             },
+            caseList: []
           });
         } else {
           const userData = await userSnapshot.data();
-          set({ userData: userData as UserData });
+          set({
+            userData: userData as UserData,
+            caseList: userData?.caseList as CaseData[] || [],
+          });
         }
       }
     } catch (error) {
@@ -126,7 +130,10 @@ const useStore = create<state & actions & loaders>((set, get) => ({
           .doc(response.data.user.email.toString());
         const userSnapshot = await userRef.get();
         const userData = await userSnapshot.data();
-        set({ userData: userData as UserData });
+        set({
+          userData: userData as UserData,
+          caseList: userData?.caseList as CaseData[] || [],
+        });
       }
     } catch (error) {
       console.log(error);
@@ -138,7 +145,7 @@ const useStore = create<state & actions & loaders>((set, get) => ({
       await GoogleSignin.signOut();
       router.dismissAll();
       await new Promise((resolve) => setTimeout(resolve, 500));
-      set({ user: null, userData: defaultUserData });
+      set({ user: null, userData: defaultUserData, caseList: [], currentCase: null });
     } catch (error) {
       console.log(error);
     }
@@ -152,12 +159,10 @@ const useStore = create<state & actions & loaders>((set, get) => ({
       const userData = get().userData;
       await userRef.update({
         preferences: userData.preferences,
+        caseList: get().caseList,
       });
     } catch (error) {
-      Alert.alert(
-        "Unknown Firebase Error",
-        "Could not update user preferences"
-      );
+      Alert.alert("Could not sync userData", error as string);
     }
   },
 
@@ -407,7 +412,10 @@ const useStore = create<state & actions & loaders>((set, get) => ({
       });
 
       set({ contextHistory: history });
-      ToastAndroid.show("ResearchFindings are now available!", ToastAndroid.SHORT);
+      ToastAndroid.show(
+        "ResearchFindings are now available!",
+        ToastAndroid.SHORT
+      );
     } catch (error) {
       Alert.alert("Error Getting research findings", error?.toString());
     } finally {
@@ -415,8 +423,8 @@ const useStore = create<state & actions & loaders>((set, get) => ({
     }
   },
 
-  getHearingAdvice: async(caseData: CaseData):Promise<string> => {
-    let text:string = "";
+  getHearingAdvice: async (caseData: CaseData): Promise<string> => {
+    let text: string = "";
     try {
       set({ responseLoading: true });
 
@@ -432,9 +440,7 @@ const useStore = create<state & actions & loaders>((set, get) => ({
         history: history,
       });
 
-      const result = await chat.sendMessage(
-        getHearingAdvicePrompt(caseData)
-      );
+      const result = await chat.sendMessage(getHearingAdvicePrompt(caseData));
       const response = result.response;
       text = response.text();
       set({ contextHistory: history });
@@ -444,7 +450,7 @@ const useStore = create<state & actions & loaders>((set, get) => ({
       set({ responseLoading: false });
     }
     return text;
-  }
+  },
 }));
 
 export default useStore;

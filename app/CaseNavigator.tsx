@@ -8,11 +8,14 @@ import Collapsible from 'react-native-collapsible'
 import { CaseFiling, CaseResolution, EvidenceCollection, HearingManagement, LegalResearch } from '@/global'
 import { router } from 'expo-router'
 import LottieView from 'lottie-react-native'
+import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
+import Markdown from 'react-native-markdown-display'
+import { navigatorInfo } from '@/utils/utils'
 
 const CaseNavigator = () => {
 
-  const [currentCase, caseList, getLegalResearch, responseLoading] = useStore(
-    useShallow((state) => [state.currentCase, state.caseList, state.getLegalResearch, state.responseLoading])
+  const [currentCase, getLegalResearch, responseLoading] = useStore(
+    useShallow((state) => [state.currentCase, state.getLegalResearch, state.responseLoading])
   )
 
   const [filingExpanded, setFilingExpanded] = useState<boolean>(false)
@@ -20,7 +23,7 @@ const CaseNavigator = () => {
   const [researchExpanded, setResearchExpanded] = useState<boolean>(false)
   const [hearingExpanded, setHearingExpanded] = useState<boolean>(false)
   const [researchGenerated, setResearchGenerated] = useState<boolean>(false)
-  const [resolutionExpanded, setResolutionExpanded] = useState<boolean>(false)
+  const [formExpanded, setFormExpanded] = useState<boolean>(false)
 
   const [navigateStatus, setNavigateStatus] = useState<number>(currentCase?.navigateStatus || 0)
   const [title, setTitle] = useState<string>(currentCase?.caseFiling.caseTitle || "")
@@ -950,6 +953,37 @@ const CaseNavigator = () => {
           : null}
         <View className='h-[80]'></View>
       </ScrollView>
+      <Animated.View
+        layout={LinearTransition}
+        className={`absolute p-5 ${formExpanded ? 'rounded-xl' : 'rounded-3xl right-5'} bg-darkbg self-center bottom-1`}
+      >
+        <Pressable
+          onPress={() => {
+            setFormExpanded(!formExpanded)
+          }}
+          className=''
+        >
+          {!formExpanded ?
+            <Animated.View entering={FadeIn} exiting={FadeOut}><Ionicons name='help' size={25} color={'white'} /></Animated.View>
+            :
+            <Animated.View entering={FadeIn} exiting={FadeOut} >
+              <Text className='text-white text-xl font-bold'>
+                What is this?
+              </Text>
+              <Markdown
+                style={{
+                  text: {
+                    color: 'white',
+                    fontWeight: 'semibold',
+                  }
+                }}
+              >
+                {navigatorInfo}
+              </Markdown>
+            </Animated.View>
+          }
+        </Pressable>
+      </Animated.View>
     </SafeAreaView>
   )
 }

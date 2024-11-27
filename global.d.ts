@@ -73,6 +73,7 @@ interface Preferences {
 
 interface UserData {
   preferences: Preferences;
+  caseList: CaseData[]
 }
 
 interface ChatItem {

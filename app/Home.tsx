@@ -1,4 +1,4 @@
-import { View, Text, Pressable, Dimensions } from 'react-native'
+import { View, Text, Pressable, Dimensions, AppState } from 'react-native'
 import React, { useEffect, useRef } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import useStore from '@/store/useStore'
@@ -12,13 +12,24 @@ import LottieView from 'lottie-react-native'
 
 const Home = () => {
 
-  const [user, loadInitialPromopt, caseList] = useStore(
-    useShallow((state) => [state.user, state.loadInitialPrompt, state.caseList])
+  const [user, loadInitialPromopt, caseList, syncUserData] = useStore(
+    useShallow((state) => [state.user, state.loadInitialPrompt, state.caseList, state.syncUserData])
   )
 
   useEffect(() => {
     //loadInitialPromopt()
   }, [])
+
+  useEffect(() => {
+    const appStateListener = AppState.addEventListener("change", async (nextAppState) => {
+      if (nextAppState === "background" || nextAppState === "inactive") {
+        await syncUserData();
+      }
+    });
+    return () => {
+      appStateListener.remove();
+    };
+  }, [syncUserData]);
 
   const animation = useRef(null)
 
@@ -45,7 +56,10 @@ const Home = () => {
           <Ionicons name='person' size={25} />
         </Pressable>
       </View>
-      <View className='flex-1 '>
+      <View className='flex-1 mt-5'>
+        <Text className='text-darkbg text-xl'>
+          Your Legal Cases!
+        </Text>
         {caseList.length === 0 ?
           <View className='justify-center flex-1 pb-40 px-5'>
             <Text className='text-darkbg text-2xl font-semibold'>
@@ -64,9 +78,11 @@ const Home = () => {
                   router.navigate("/CaseNavigator")
                 }}
               >
-                <Text>
-                  {item.caseFiling.caseTitle}
-                </Text>
+                <View className='p-5 rounded-xl bg-secondary my-1'>
+                  <Text className='text-lg font-bold'>
+                    {item.caseFiling.caseTitle}
+                  </Text>
+                </View>
               </Pressable>
             )}
           </>

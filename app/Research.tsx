@@ -6,10 +6,10 @@ import { useShallow } from 'zustand/shallow'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { router } from 'expo-router'
 
-const Evidence = () => {
+const Research = () => {
 
   const [currentCase] = useStore(
-    useShallow((state)=>[state.currentCase])
+    useShallow((state) => [state.currentCase])
   )
 
   return (
@@ -26,40 +26,46 @@ const Evidence = () => {
           </Pressable>
           <View>
             <Text className='text-xl text-darkbg font-bold'>
-              Evidence List
+              Research Findings
             </Text>
             <Text className='text-base text-darkbg'>
-              View and manage your evidences
+              View and manage research
             </Text>
           </View>
        </View>
-        {currentCase?.evidenceCollection?.map((item) =>
+        {currentCase?.legalResearch?.map((item) =>
           <View className='bg-secondary my-1 rounded-xl p-5'>
-            {item.title ?
+            {item.topic ?
               <Text className='font-semibold text-darkbg text-lg'>
-                Title: {item.title}
+                Topic: {item.topic}
               </Text> : null}
-
-            {item.description ?
+            {item.notes ?
               <Text className='text-darkbg font-semibold'>
-                Description: <Text className='font-normal'>{item.description}</Text>
+                Notes: <Text className='font-normal'>{item.notes}</Text>
               </Text> : null}
-
-            {item.uploadDate ?
+            {item.precedentCase.caseTitle ?
               <Text className='text-darkbg font-semibold'>
-                Upload Date: <Text className='font-normal'>{item.uploadDate}</Text>
+                Title: <Text className='font-normal'>{item.precedentCase.caseTitle}</Text>
               </Text> : null}
-
-            {item.evidenceType ?
+            {item.precedentCase.caseSummary ?
               <Text className='text-darkbg font-semibold'>
-                Type: <Text className='font-normal'>{item.evidenceType}</Text>
+                Summary: <Text className='font-normal'>{item.precedentCase.caseSummary}</Text>
+              </Text> : null}
+            {item.precedentCase.rulingDate ?
+              <Text className='text-darkbg font-semibold'>
+                Ruling Date: <Text className='font-normal'>{item.precedentCase.rulingDate}</Text>
+              </Text> : null}
+            {item.precedentCase.court ?
+              <Text className='text-darkbg font-semibold'>
+                Court: <Text className='font-normal'>{item.precedentCase.court}</Text>
               </Text> : null}
           </View>
 
         )}
+        <View className='h-[60]'></View>
       </ScrollView>
     </SafeAreaView>
   )
 }
 
-export default Evidence
+export default Research

@@ -9,15 +9,25 @@ import { Content, GoogleGenerativeAI } from "@google/generative-ai";
 import RNFS from "react-native-fs";
 import {
   documentPrompt,
+  getHearingAdvicePrompt,
+  getResearchFindingsPrompt,
   initialPrompt,
   newCasePrompt,
   predictionPrompt,
   summaryPrompt,
 } from "@/utils/constants/prompts";
 
-import { Alert } from "react-native";
+import { Alert, ToastAndroid } from "react-native";
 import { clearMarkdown } from "@/utils/utils";
-import { CaseData, CaseFiling, CasePrediction, ChatItem, DocumentAnalysis, UserData } from "@/global";
+import {
+  CaseData,
+  CaseFiling,
+  CasePrediction,
+  ChatItem,
+  DocumentAnalysis,
+  LegalResearch,
+  UserData,
+} from "@/global";
 import firestore from "@react-native-firebase/firestore";
 import { defaultUserData } from "@/utils/constants/defaultUserData";
 import { WEB_CLIENT_ID, GEMINI_API_KEY } from "@/Keys";
@@ -37,7 +47,7 @@ type state = {
   documentSummaryLines: string[] | null;
   casePrediction: CasePrediction | null;
   messageList: ChatItem[];
-  caseList: CaseData[]
+  caseList: CaseData[];
   currentCase: CaseData | null;
 };
 
@@ -51,7 +61,9 @@ type actions = {
   getCasePrediction: (file: string) => Promise<void>;
   loadInitialPrompt: () => Promise<void>;
   syncUserData: () => Promise<void>;
-  initNewCase: (title:string, description: string) => Promise<void>
+  initNewCase: (title: string, description: string) => Promise<void>;
+  getLegalResearch: (caseData: CaseData) => Promise<void>;
+  getHearingAdvice: (caseData: CaseData) => Promise<string>
 };
 
 type loaders = {
@@ -310,6 +322,7 @@ const useStore = create<state & actions & loaders>((set, get) => ({
       set({ responseLoading: false });
     }
   },
+
   initNewCase: async (title: string, description: string) => {
     try {
       set({ responseLoading: true });
@@ -337,16 +350,100 @@ const useStore = create<state & actions & loaders>((set, get) => ({
         evidenceCollection: [],
         legalResearch: [],
         hearingManagement: [],
-        caseResolution: null
-      }
-      set({caseList: [...get().caseList,caseData], currentCase: caseData})
+        caseResolution: null,
+      };
+      set({ caseList: [...get().caseList, caseData], currentCase: caseData });
       set({ contextHistory: history });
-      console.log(caseFiling)
+      console.log(caseFiling);
     } catch (error) {
       Alert.alert("Error Initiating a new case", error?.toString());
     } finally {
       set({ responseLoading: false });
     }
+  },
+
+  getLegalResearch: async (caseData: CaseData) => {
+    try {
+      set({ responseLoading: true });
+
+      const history = get().contextHistory;
+      const model = genAI.getGenerativeModel({
+        model: GEMINI_MODEL,
+        generationConfig: {
+          responseMimeType: "application/json",
+        },
+      });
+
+      const chat = model.startChat({
+        history: history,
+      });
+
+      const result = await chat.sendMessage(
+        getResearchFindingsPrompt(caseData)
+      );
+      const response = result.response;
+      const text = response.text();
+
+      const researchFindings: LegalResearch[] = JSON.parse(
+        text
+      ) as LegalResearch[];
+
+      set((state) => {
+        const { caseList, currentCase } = state;
+        if (!currentCase) return state;
+        const updatedCaseList = caseList.map((caseItem) =>
+          caseItem.caseFiling.caseTitle === currentCase.caseFiling?.caseTitle
+            ? { ...caseItem, legalResearch: researchFindings }
+            : caseItem
+        );
+        return {
+          ...state,
+          currentCase: {
+            ...currentCase,
+            legalResearch: researchFindings,
+          },
+          caseList: updatedCaseList,
+        };
+      });
+
+      set({ contextHistory: history });
+      ToastAndroid.show("ResearchFindings are now available!", ToastAndroid.SHORT);
+    } catch (error) {
+      Alert.alert("Error Getting research findings", error?.toString());
+    } finally {
+      set({ responseLoading: false });
+    }
+  },
+
+  getHearingAdvice: async(caseData: CaseData):Promise<string> => {
+    let text:string = "";
+    try {
+      set({ responseLoading: true });
+
+      const history = get().contextHistory;
+      const model = genAI.getGenerativeModel({
+        model: GEMINI_MODEL,
+        generationConfig: {
+          responseMimeType: "text/plain",
+        },
+      });
+
+      const chat = model.startChat({
+        history: history,
+      });
+
+      const result = await chat.sendMessage(
+        getHearingAdvicePrompt(caseData)
+      );
+      const response = result.response;
+      text = response.text();
+      set({ contextHistory: history });
+    } catch (error) {
+      Alert.alert("Error Getting Hearing Advice", error?.toString());
+    } finally {
+      set({ responseLoading: false });
+    }
+    return text;
   }
 }));
 

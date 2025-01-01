@@ -162,7 +162,8 @@ const useStore = create<state & actions & loaders>((set, get) => ({
         caseList: get().caseList,
       });
     } catch (error) {
-      Alert.alert("Could not sync userData", error as string);
+      console.log(error?.toString())
+      ToastAndroid.show(`Sync error: ${String(error)}`, ToastAndroid.LONG);
     }
   },
 

@@ -69,7 +69,7 @@ const CaseNavigator = () => {
         name: userName.trim(),
         contact: contact.trim(),
         email: email.trim(),
-        address: address.trim() || undefined,
+        address: address.trim(),
       },
       caseType: caseCategory as CaseFiling['caseType'],
       filingDate: filingDate.trim(),
@@ -82,7 +82,7 @@ const CaseNavigator = () => {
       (p) => p.caseFiling.caseTitle === currentCase?.caseFiling?.caseTitle
     );
     if (caseIndex !== -1) {
-      useStore.setState((state) => {
+      useStore.setState((state: any) => {
         const updatedCaseList = [...state.caseList];
         updatedCaseList[caseIndex] = {
           ...updatedCaseList[caseIndex],
@@ -92,12 +92,7 @@ const CaseNavigator = () => {
           ...state,
           currentCase: {
             ...state.currentCase,
-            navigateStatus: state.currentCase?.navigateStatus ?? 0,
             caseFiling: updatedCaseFiling,
-            evidenceCollection: state.currentCase?.evidenceCollection ?? null,
-            legalResearch: state.currentCase?.legalResearch ?? null,
-            hearingManagement: state.currentCase?.hearingManagement ?? null,
-            caseResolution: state.currentCase?.caseResolution ?? null,
           },
           caseList: updatedCaseList,
         };
@@ -120,7 +115,7 @@ const CaseNavigator = () => {
     );
 
     if (caseIndex !== -1) {
-      useStore.setState((state) => {
+      useStore.setState((state: any) => {
         const updatedEvidenceCollection = [
           ...(state.currentCase?.evidenceCollection || []),
           newEvidence,
@@ -136,12 +131,7 @@ const CaseNavigator = () => {
           ...state,
           currentCase: {
             ...state.currentCase,
-            navigateStatus: state.currentCase?.navigateStatus ?? 0,
             evidenceCollection: updatedEvidenceCollection,
-            caseFiling: state.currentCase?.caseFiling!!,
-            legalResearch: state.currentCase?.legalResearch ?? null,
-            hearingManagement: state.currentCase?.hearingManagement ?? null,
-            caseResolution: state.currentCase?.caseResolution ?? null,
           },
           caseList: updatedCaseList,
         };
@@ -173,7 +163,7 @@ const CaseNavigator = () => {
     );
 
     if (caseIndex !== -1) {
-      useStore.setState((state) => {
+      useStore.setState((state: any) => {
         const updatedLegalResearch = [
           ...(state.currentCase?.legalResearch || []),
           researchFinding,
@@ -189,12 +179,7 @@ const CaseNavigator = () => {
           ...state,
           currentCase: {
             ...state.currentCase,
-            navigateStatus: state.currentCase?.navigateStatus ?? 0,
             legalResearch: updatedLegalResearch,
-            caseFiling: state.currentCase?.caseFiling!!,
-            evidenceCollection: state.currentCase?.evidenceCollection ?? null,
-            hearingManagement: state.currentCase?.hearingManagement ?? null,
-            caseResolution: state.currentCase?.caseResolution ?? null,
           },
           caseList: updatedCaseList,
         };
@@ -229,7 +214,7 @@ const CaseNavigator = () => {
     );
 
     if (caseIndex !== -1) {
-      useStore.setState((state) => {
+      useStore.setState((state: any) => {
         const updatedHearingManagement = [
           ...(state.currentCase?.hearingManagement || []),
           hearing,
@@ -245,12 +230,7 @@ const CaseNavigator = () => {
           ...state,
           currentCase: {
             ...state.currentCase,
-            navigateStatus: state.currentCase?.navigateStatus ?? 0,
             hearingManagement: updatedHearingManagement,
-            caseFiling: state.currentCase?.caseFiling!!,
-            legalResearch: state.currentCase?.legalResearch ?? null,
-            evidenceCollection: state.currentCase?.evidenceCollection ?? null,
-            caseResolution: state.currentCase?.caseResolution ?? null,
           },
           caseList: updatedCaseList,
         };
@@ -291,7 +271,7 @@ const CaseNavigator = () => {
     );
 
     if (caseIndex !== -1) {
-      useStore.setState((state) => {
+      useStore.setState((state: any) => {
         const updatedCaseList = [...state.caseList];
         updatedCaseList[caseIndex] = {
           ...updatedCaseList[caseIndex],
@@ -302,12 +282,7 @@ const CaseNavigator = () => {
           ...state,
           currentCase: {
             ...state.currentCase,
-            navigateStatus: state.currentCase?.navigateStatus ?? 0,
             caseResolution: resolution,
-            caseFiling: state.currentCase?.caseFiling!!,
-            legalResearch: state.currentCase?.legalResearch ?? null,
-            evidenceCollection: state.currentCase?.evidenceCollection ?? null,
-            hearingManagement: state.currentCase?.hearingManagement ?? null,
           },
           caseList: updatedCaseList,
         };

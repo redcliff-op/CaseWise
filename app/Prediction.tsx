@@ -209,14 +209,14 @@ const Prediction = () => {
             </ScrollView>
             :
             <>
-              <Animated.View entering={FadeIn} exiting={FadeOut}>
+              <View>
                 <Text className='text-primary text-xl font-bold'>
                   CaseWise Case Predictor!
                 </Text>
                 <Text className='text-black'>
                   Predict the outcome of any Case!
                 </Text>
-              </Animated.View>
+              </View>
               <View className='flex-1 justify-center gap-2'>
                 <LottieView
                   autoPlay

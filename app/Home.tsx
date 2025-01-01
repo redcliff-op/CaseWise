@@ -1,14 +1,13 @@
-import { View, Text, Pressable, Dimensions, AppState } from 'react-native'
+import { View, Text, Pressable, AppState } from 'react-native'
 import React, { useEffect, useRef } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import useStore from '@/store/useStore'
-import Animated, { FadeIn, FadeInDown, FadeOut, FadeOutDown } from 'react-native-reanimated'
+import Animated from 'react-native-reanimated'
 
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { router } from 'expo-router'
 import { useShallow } from 'zustand/shallow'
 import { getGreeting } from '@/utils/utils'
-import LottieView from 'lottie-react-native'
 
 const Home = () => {
 
@@ -17,11 +16,11 @@ const Home = () => {
   )
 
   useEffect(() => {
-    //loadInitialPromopt()
+    loadInitialPromopt()
   }, [])
 
   useEffect(() => {
-    const appStateListener = AppState.addEventListener("change", async (nextAppState) => {
+    const appStateListener = AppState.addEventListener("change", async (nextAppState: string) => {
       if (nextAppState === "background" || nextAppState === "inactive") {
         await syncUserData();
       }
@@ -38,7 +37,7 @@ const Home = () => {
       <View className=' items-center flex-row justify-between'>
         <View className='flex-row gap-2 items-center'>
           <Animated.Image
-            //sharedTransitionTag={user?.user.email + "-image"}
+            sharedTransitionTag={user?.user.email + "-image"}
             source={{ uri: user?.user.photo?.toString() }}
             className='w-[50] h-[50] rounded-full'
           />

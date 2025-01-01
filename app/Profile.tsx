@@ -15,7 +15,7 @@ const Profile = () => {
     <SafeAreaView className='flex-1 bg-background px-4 justify-between'>
       <View className=' gap-2 -mx-4'>
         <Animated.Image
-          //sharedTransitionTag={user?.user.email + "-image"}
+          sharedTransitionTag={user?.user.email + "-image"}
           source={{ uri: user?.user?.photo?.toString() }}
           className='w-[50%] aspect-square self-center rounded-full border-primary border-4'
         />
